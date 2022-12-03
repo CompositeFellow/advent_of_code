@@ -16,7 +16,10 @@ fn main() {
     }
     cal_list.sort();
     cal_list.reverse();
-    println!("{}", cal_list[0]);
+    println!("Top Elf cal: {}", cal_list[0]);
+
+    let top_three_total = &cal_list[0..3].iter().sum::<u64>();
+    println!("Top 3 Elves total cal: {}", top_three_total);
 }
 
 
