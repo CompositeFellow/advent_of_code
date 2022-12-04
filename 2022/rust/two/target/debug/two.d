@@ -1,0 +1,1 @@
+/home/gunnison/dev/compositeFellow/advent_of_code/2022/rust/two/target/debug/two: /home/gunnison/dev/compositeFellow/advent_of_code/2022/rust/two/src/input.txt /home/gunnison/dev/compositeFellow/advent_of_code/2022/rust/two/src/main.rs
