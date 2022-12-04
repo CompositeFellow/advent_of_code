@@ -14,129 +14,67 @@
 // Y = need to draw
 // Z = need to win
 
-enum End_Game_Condition {
-    Win,
-    Loss,
-    Draw
-}
-
 fn main() {
-    const GESTURES : [&str;3] = ["A", "B", "C"];
-    const ENCODED_WL : [[&str; 3];3] = [["B","A","C"],["C","B","A"], ["A","C","B"]];
-    const ROCK_WL_ENCODING: [&str; 3]  = ["C","A","B"];
-    const PAPER_WL_ENCODING: [&str; 3] = ["A","B","C"];
-    const SCISSORS_WL_ENCODING: [&str; 3] = ["B","C","A"];
+    const ENCODED_WL : [[&str; 3];3] = [["C","A","B"],["A","B","C"], ["B","C","A"]];
 
-    fn calc_wld_total(game_list: &Vec<(&str, &str)>) -> u64 {
-        let total: u64 = game_list.iter()
-        .map(|game|(calc_wld_score(game)))
-        .collect::<Vec<u64>>()
-        .iter()
-        .sum();
-    
-        return total;
-    }
-    
-    fn calc_wld_score(game: &(&str, &str)) -> u64{
-        match game.1 {
-            "A" => compare_gestures(game.0, ROCK_WL_ENCODING),
-            "B" => compare_gestures(game.0, PAPER_WL_ENCODING),
-            "C" => compare_gestures(game.0, SCISSORS_WL_ENCODING),
-            _ => panic!("Failed to compare gestures")
-        }
-    }
-    
-    fn compare_gestures(opponent_move: &str, encoding: [&str; 3]) -> u64 {
-        let opponent_move_i: i8 = encoding.iter().position(|i| i == &opponent_move).unwrap() as i8;
-        let outcome: i8 = 1 - opponent_move_i;
-        match outcome {
-            -1 => 0u64,
-            0 => 3u64,
-            1 => 6u64,
-            _ => panic!("Error in comparing gestures")
-        }
-    }
-
-    fn p2_translate_gesture(game: &(&str, &str)) -> (String, String){
-        let opponent_move = game.0;
-        let wl_key: [&str; 3] = match opponent_move{
-            "A" => ENCODED_WL[0],
-            "B" => ENCODED_WL[1],
-            "C" => ENCODED_WL[2],
-            _ => panic!("Error finding wl key")
-        };
-
-        let my_move: &str = match game.1 {
-            "X" => wl_key[2],
-            "Y" => wl_key[1],
-            "Z" => wl_key[0],
-            _ => panic!("Error matching win condition.")
-        };
-
-        return (opponent_move.to_string(), my_move.to_string());
-
-    }
-
-    //creates a vector of tuples repersenting the game gestures from the input
-    let game_plan: Vec<(&str, &str)> = include_str!("input.txt")
+    let given_strategy: Vec<(&str, &str)> = include_str!("input.txt")
         .split("\n")
         .map(|game| game.split_once(" ").unwrap())
         .collect();
-
-    // updates the second tuple value to be A,B,C instead of X,Y,Z
-
-    let p1_translated_game_list: Vec<(&str, &str)> = game_plan.iter()
-        .map(|game|(game.0, p1_translate_gesture(game.1)))
+    let p1_strat: Vec<(&str, &str)> = given_strategy.iter()
+        .map(|game| (game.0, p1_translate_strat(game.1)))
         .collect();
-    let p1_gesture_total = calc_gesture_score(&p1_translated_game_list);
-    let p1_wld_total = calc_wld_total(&p1_translated_game_list);
-    let p1_total = p1_gesture_total + p1_wld_total;
-    let p2_translated_game_list: Vec<(String, String)> = game_plan.iter()
-        .map(|game| p2_translate_gesture(game))
+    let p2_strat: Vec<(&str, &str)> = given_strategy.iter()
+        .map(|game| (game.0, p2_translate_strat(game)))
         .collect();
-    let p2_gesture_total = calc_gesture_score(&p2_translated_game_list);
-    let p2_wld_total = calc_wld_total(&p2_translated_game_list);
-    let p2_total = p2_gesture_total + p2_wld_total;
+    let p1_score: u64 = calc_score(p1_strat);
+    let p2_score: u64 = calc_score(p2_strat);
 
-
-
-    println!("P1 Gesture Total: {:?}", p1_gesture_total);
-    println!("P1 Game Condition Total: {:?}", p1_wld_total);
-    println!("P1 Total: {:?}", p1_total)
-    println!("P1 Gesture Total: {:?}", p2_gesture_total);
-    println!("P1 Game Condition Total: {:?}", p2_wld_total);
-    println!("P1 Total: {:?}", p2_total)
-}
-
-
-fn p1_translate_gesture(gesture: &str) -> &str {
-    match gesture{
-        "X" => "A",
-        "Y" => "B",
-        "Z" => "C",
-        _ => panic!("Invalid rochambeau gesture found."),
-    }
-}
-
-
-
-
-
-fn calc_gesture_score(game_list: &Vec<(&str, &str)>) -> u64 {
-    let total: u64 = game_list.iter()
-    .map(|game|(
-        match game.1{
-            "A" => 1,
-            "B" => 2,
-            "C" => 3,
-            _ => panic!("Invalid gesture found!")
+    fn p1_translate_strat(code: &str) -> &str{
+        match code{
+            "X" => "A",
+            "Y" => "B",
+            "Z" => "C",
+            _ => panic!("P1 failure to translate strategy")
         }
-    ))
-    .collect::<Vec<u64>>()
-    .iter()
-    .sum();
+    }
 
-    return total;
+
+    fn p2_translate_strat<'a>(game: &(&str, &str)) ->&'a str{
+        let wl_key = ["A", "B", "C"].iter().enumerate()
+            .find(|(_, &key)| key == game.0)
+            .map(|(i, _)| ENCODED_WL[i])
+            .unwrap_or_else(|| panic!("Failed to find encoding"));
+    
+        let new_move = ["X", "Y", "Z"].iter().enumerate()
+            .find(|(_, &key)| key == game.1)
+            .map(|(i, _)| &wl_key[i])
+            .unwrap_or_else(|| panic!("P2 Failed to find strategy"));
+    
+        return new_move;
+    }
+
+    fn calc_score(strat: Vec<(&str, &str)>) -> u64 {
+        let mut score:u64 = 0;
+        for game in strat{
+            match game.1{
+                "A" => score +=1,
+                "B" => score +=2,
+                "C" => score +=3,
+                _ => panic!("Failed to tally gesture score.")
+            }
+            
+            if game.0 == game.1{
+                score += 3
+            } else if game.0 == "A" && game.1 == "B" || game.0 == "B" && game.1 == "C" || game.0 == "C" && game.1 == "A"{
+                score += 6
+            }
+        }
+        return score;
+    }
+
+
+    println!("P1 Score {:?}", &p1_score);
+    print!("P2 Score {:?}", &p2_score);
 }
-
 
