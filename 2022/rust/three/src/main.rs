@@ -15,15 +15,17 @@ fn main() {
         'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     // let mut shared_items = Vec::new();
     let mut priority_sum: u32 = 0;
-    let all_rucksacks: Vec<&str> = include_str!("input.txt").lines().collect();
+    let mut group_item_sum: u32 = 0;
+    let all_rucksacks: Vec<&str> = include_str!("input.txt").lines().collect(); 
+
 
     fn calc_priority(item: &char) -> u32{
         let priority: u32 = VALID_ITEMS.iter().position(|i| i == item).unwrap() as u32;
         return priority + 1;
     }
     
-
-    for rucksack in all_rucksacks{
+    
+    for rucksack in &all_rucksacks{
         let split_index: usize = (rucksack.len())/2;
         
         let compartment1:&str = &rucksack[0..split_index];
@@ -42,6 +44,22 @@ fn main() {
         }
     }
 
+    for sack_group in all_rucksacks.chunks(3){
+        let a = sack_group[0];
+        let b = sack_group[1];
+        let c = sack_group[2];
+
+
+        for item in a.chars(){
+            if b.contains(item) && c.contains(item){
+                group_item_sum += calc_priority(&item);
+                break;
+            }
+        }
+    }
+
     println!("Part 1 priority sum: {}", priority_sum);
+    println!("Part 2 group_sum: {}", group_item_sum)
+
 }
 
