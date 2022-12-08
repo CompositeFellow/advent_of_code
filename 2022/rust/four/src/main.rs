@@ -1,6 +1,7 @@
 
 fn main (){
-  let mut p1_total:u32 = 0;
+  let mut p1_total: u32 = 0;
+  let mut p2_total: u32 = 0;
   let input: Vec<&str> = include_str!("input.txt").lines().collect();
   let x: Vec<Vec<&str>> = input.into_iter().map(|l| l.split(",").collect()).collect();
   let y: Vec<Vec<Vec<&str>>>= x.iter()
@@ -19,8 +20,13 @@ fn main (){
     if a1 <= b1 && b2 <= a2 || b1 <= a1 && a2 <= b2{
       p1_total += 1;
     }
+
+    if a1 <= b2 && b1 <= a2{
+      p2_total += 1;
+    }
   }
   
   println!("Part 1 sum: {}", p1_total);
+  println!("Part 2 sum: {}", p2_total);
 
 }
