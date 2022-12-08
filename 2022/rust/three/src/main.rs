@@ -12,7 +12,7 @@ fn main() {
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 
         'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 
-        'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     // let mut shared_items = Vec::new();
     let mut priority_sum: u32 = 0;
     let mut group_item_sum: u32 = 0;
